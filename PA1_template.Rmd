@@ -1,20 +1,84 @@
 # Reproducible Research: Peer Assessment 1
 
 
+
 ## Loading and preprocessing the data
+
+### Load activity data
+
+activity <- read.csv("activity.csv", header=TRUE,sep=",")
+
+### Remove NA's before daily or interval segments
+
+no.na.activity <- complete.cases(activity)
+complete.activity <- activity[no.na.activity,]
 
 
 
 ## What is mean total number of steps taken per day?
 
 
+### Calculate number of steps taken per day
+
+activity.by.day <- aggregate(complete.activity$steps, by = list(complete.activity$date), sum)
+names(activity.by.day)[1] <- "day"
+names(activity.by.day)[2] <- "steps"
+
+### Plot data for histogram of frequency of daily step counts
+
+step.frequency <- hist(activity.by.day$steps)
+
+### Plot data for histogram of steps taken each day
+
+png(file="StepHistogram.png",width=600,height=480)
+
+plot(activity.by.day$day, activity.by.day$steps, col = "black", type = "h", ylab = "Daily Total 
+Number of Steps", xlab = "Date")
+
+dev.off()
+
+### Calculate average steps taken each day
+
+mean(activity.by.day$steps)
+median(activity.by.day$steps)
+
+
 
 ## What is the average daily activity pattern?
 
+### Calculate average steps taken each interval
+
+activity.by.interval <- aggregate(complete.activity$steps, by = list(complete.activity
+$interval), mean)
+names(activity.by.interval)[1] <- "interval"
+names(activity.by.interval)[2] <- "steps"
+
+### Plot data for time series of average number of steps taken each interval
+
+png(file="StepsbyInterval.png",width=600,height=480)
+
+plot(activity.by.interval$interval, activity.by.interval$steps, type = "l", ylab = "Average 
+Number of Steps", xlab = "Interval")
+
+dev.off()
+### Calculate interval with maximum average steps taken
+
+activity.by.interval[activity.by.interval$steps >= max(activity.by.interval$steps), ]
 
 
 ## Imputing missing values
 
+### Determine a strategy for inputting missing data
+All days with missing step data are missing the step data for all intervals of those days. Thus, the average interval data will evenly divide into the missing interval data, in the order of the missing interval data. This will serve to replace the mising data for each interval with the average step data for that particular interval.
+
+### Identify rows with NAs
+#### Previously defined: no.na.activity <- complete.cases(activity)
+activity.missing <- activity[!no.na.activity,]
+
+### Calculate number of Rows with Missing Step Data
+print(Number of Rows with Missing Step Data: )
+print(nrow(activity)-nrow(activity.clean))
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
