@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<!-- saved from url=(0014)about:internet -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=9" >
+
+<title>Reproducible Research: Peer Assessment 1</title>
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 12px;
+   margin: 8px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 { 
+   font-size:2.2em; 
+}
+
+h2 { 
+   font-size:1.8em; 
+}
+
+h3 { 
+   font-size:1.4em; 
+}
+
+h4 { 
+   font-size:1.0em; 
+}
+
+h5 { 
+   font-size:0.9em; 
+}
+
+h6 { 
+   font-size:0.8em; 
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre {	
+   margin-top: 0;
+   max-width: 95%;
+   border: 1px solid #ccc;
+   white-space: pre-wrap;
+}
+
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code.r, code.cpp {
+   background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * { 
+      background: transparent !important; 
+      color: black !important; 
+      filter:none !important; 
+      -ms-filter: none !important; 
+   }
+
+   body { 
+      font-size:12pt; 
+      max-width:100%; 
+   }
+       
+   a, a:visited { 
+      text-decoration: underline; 
+   }
+
+   hr { 
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote { 
+      padding-right: 1em; 
+      page-break-inside: avoid; 
+   }
+
+   tr, img { 
+      page-break-inside: avoid; 
+   }
+
+   img { 
+      max-width: 100% !important; 
+   }
+
+   @page :left { 
+      margin: 15mm 20mm 15mm 10mm; 
+   }
+     
+   @page :right { 
+      margin: 15mm 10mm 15mm 20mm; 
+   }
+
+   p, h2, h3 { 
+      orphans: 3; widows: 3; 
+   }
+
+   h2, h3 { 
+      page-break-after: avoid; 
+   }
+}
+
+</style>
+
+
+
+
+
+</head>
+
+<body>
+<h1>Reproducible Research: Peer Assessment 1</h1>
+
+<h2>Loading and preprocessing the data</h2>
+
+<h3>Load activity data</h3>
+
+<p>activity &lt;- read.csv(&ldquo;activity.csv&rdquo;, header=TRUE,sep=&ldquo;,&rdquo;)</p>
+
+<h3>Remove NA&#39;s before daily or interval segments</h3>
+
+<p>no.na.activity &lt;- complete.cases(activity)
+complete.activity &lt;- activity[no.na.activity,]</p>
+
+<h2>What is mean total number of steps taken per day?</h2>
+
+<h3>Calculate number of steps taken per day</h3>
+
+<p>activity.by.day &lt;- aggregate(complete.activity$steps, by = list(complete.activity$date), sum)
+names(activity.by.day)[1] &lt;- &ldquo;day&rdquo;
+names(activity.by.day)[2] &lt;- &ldquo;steps&rdquo;</p>
+
+<h3>Plot data for histogram of frequency of daily step counts</h3>
+
+<p>png(file=&ldquo;StepHistogram.png&rdquo;,width=600,height=480)</p>
+
+<p>hist(activity.by.day$steps)</p>
+
+<p>dev.off()</p>
+
+<h3>Plot data for histogram of steps taken each day</h3>
+
+<p>png(file=&ldquo;StepsByDay.png&rdquo;,width=600,height=480)</p>
+
+<p>plot(activity.by.day$day, activity.by.day$steps, col = &ldquo;black&rdquo;, type = &ldquo;h&rdquo;, ylab = &ldquo;Daily Total 
+Number of Steps&rdquo;, xlab = &ldquo;Date&rdquo;)</p>
+
+<p>dev.off()</p>
+
+<h3>Calculate average steps taken each day</h3>
+
+<p>mean(activity.by.day$steps)
+median(activity.by.day$steps)</p>
+
+<h2>What is the average daily activity pattern?</h2>
+
+<h3>Calculate average steps taken each interval</h3>
+
+<p>activity.by.interval &lt;- aggregate(complete.activity$steps, by = list(complete.activity
+$interval), mean)
+names(activity.by.interval)[1] &lt;- &ldquo;interval&rdquo;
+names(activity.by.interval)[2] &lt;- &ldquo;steps&rdquo;</p>
+
+<h3>Plot data for time series of average number of steps taken each interval</h3>
+
+<p>png(file=&ldquo;StepsbyInterval.png&rdquo;,width=600,height=480)</p>
+
+<p>plot(activity.by.interval$interval, activity.by.interval$steps, type = &ldquo;l&rdquo;, ylab = &ldquo;Average 
+Number of Steps&rdquo;, xlab = &ldquo;Interval&rdquo;)</p>
+
+<p>dev.off()</p>
+
+<h3>Calculate interval with maximum average steps taken</h3>
+
+<p>activity.by.interval[activity.by.interval$steps &gt;= max(activity.by.interval$steps), ]</p>
+
+<h2>Imputing missing values</h2>
+
+<h3>Determine a strategy for inputting missing data</h3>
+
+<p>####All days with missing step data are missing the step data for all intervals of those days. Thus, the average interval data will evenly divide into the missing interval data, in the order of the missing interval data. This will serve to replace the mising data for each interval with the average step data for that particular interval.</p>
+
+<h3>Identify rows with NAs</h3>
+
+<h4>Previously defined: no.na.activity &lt;- complete.cases(activity)</h4>
+
+<p>activity.missing &lt;- activity[!no.na.activity,]</p>
+
+<h3>Calculate number of Rows with Missing Step Data</h3>
+
+<p>print(&ldquo;Number of Rows with Missing Step Data: &rdquo;)
+print(nrow(activity)-nrow(activity.clean))</p>
+
+<h3>Use Average Interval Data to fill in missing step data (correponding to that interval)</h3>
+
+<p>activity.missing.new &lt;- data.frame(steps=activity.by.interval$steps, date=activity.missing$date, interval=activity.missing$interval)</p>
+
+<h3>Combine the table of complete step data from the original dataset with the table of estimated step data for the rows that originally contained NAs</h3>
+
+<p>combined.activity &lt;- rbind(complete.activity, activity.missing.new)
+new.steps &lt;- append(complete.activity$steps, activity.missing.new$steps)</p>
+
+<p>date.info.complete &lt;- as.POSIXlt(complete.activity$date)
+date.info.missing &lt;- as.POSIXlt(activity.missing.new$date)
+new.dates &lt;- append(date.info.complete, date.info.missing)
+wday &lt;- date.info$wday</p>
+
+<p>new.interval &lt;- append(complete.activity$interval, activity.missing.new$interval)</p>
+
+<p>combined.activity &lt;- data.frame(steps=new.steps, day.type=wday, interval=new.interval)</p>
+
+<h2>Are there differences in activity patterns between weekdays and weekends?</h2>
+
+<h3>Separate weekday data from weekend dataIdentify and classify data points by day of week</h3>
+
+<p>weekday &lt;- wday &lt;= 5
+weekend &lt;- wday &gt;= 6</p>
+
+<p>weekend.activity &lt;- combined.activity[weekend, ]
+weekday.activity &lt;- combined.activity[weekday, ]</p>
+
+<h2>Panel Plot</h2>
+
+<p>png(file=&ldquo;Weekend-Weekday.Activity.png&rdquo;,width=480,height=600)
+par(mfrow=c(2,1))</p>
+
+<p>plot(weekend.activity$interval, weekend.activity$steps, col = &ldquo;blue&rdquo;, type = &ldquo;l&rdquo;, ylab = &ldquo;Number of Steps&rdquo;, xlab = &ldquo;Interval&rdquo;, main = &ldquo;Weekend Activity&rdquo;)</p>
+
+<p>plot(weekday.activity$interval, weekday.activity$steps, col = &ldquo;blue&rdquo;, type = &ldquo;l&rdquo;, ylab = &ldquo;Number of Steps&rdquo;, xlab = &ldquo;Interval&rdquo;, main = &ldquo;Weekday Activity&rdquo;)</p>
+
+<p>dev.off()</p>
+
+</body>
+
+</html>
+
